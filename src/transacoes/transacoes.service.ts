@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Error as MongooseError, Model } from 'mongoose';
 import { CreateTransacaoDto } from './dto/create-transacao.dto';
 import { Transacao, TransacaoDocument } from './schemas/transacao.schema';
 
@@ -29,8 +29,16 @@ export class TransacoesService {
   ) {}
 
   async criar(dto: CreateTransacaoDto): Promise<Transacao> {
-    const nova = new this.transacaoModel(dto);
-    return nova.save();
+    try {
+      const nova = new this.transacaoModel(dto);
+      return await nova.save();
+    } catch (e) {
+      // Dados inválidos (ex.: tipo fora de "receita"/"despesa") são erro do cliente: 400, não 500
+      if (e instanceof MongooseError.ValidationError) {
+        throw new BadRequestException(e.message);
+      }
+      throw e;
+    }
   }
 
   async listarConsolidado(): Promise<ConsolidadoResponse> {
