@@ -14,6 +14,18 @@ Projeto extensionista da disciplina **Web Mobile** (TADS — Universidade Presbi
 - Extrato com os lançamentos mais recentes.
 - As métricas são calculadas no back-end; o front-end apenas exibe os dados recebidos.
 
+## Front-end (Aula 8)
+
+Páginas estáticas em `src/public` (HTML, CSS e JS puros), servidas pelo próprio NestJS (`app.useStaticAssets`), com design **mobile first**:
+
+- **Duas telas** com barra de navegação inferior, no padrão de aplicativo de celular:
+  - **Início** (`#dashboard`, tela inicial): faz `GET /transacoes` e exibe o objeto `metricas` (Saldo Total, Total de Despesas e **Total Gasto por Impulso em vermelho**, para reflexão sobre o consumo — ODS 12) e o array `historico` como extrato, com a etiqueta "impulso" nas despesas não essenciais.
+  - **Nova transação** (`#nova`): formulário com descrição, valor, tipo (receita/despesa), categoria e consumo consciente ou por impulso (botões de rádio); ao salvar, faz `POST /transacoes` e volta ao início.
+- **O JavaScript não faz cálculos**: só lê os valores prontos do JSON e os formata em reais.
+- **Mensagens de retorno** na tela: confirmação ao salvar, aviso de campos inválidos e erro de conexão com o servidor. O botão fica desabilitado ("Salvando...") durante o envio.
+- **Pergunta consciente/impulso só para despesas**: ao escolher "Receita", o grupo some, já que receita não é gasto.
+- **Layout**: Grid nas métricas (uma coluna no celular, três a partir de 600 px) e Flexbox no extrato, no formulário e na navegação. Campos com fonte de 16 px (evita o zoom automático do iPhone) e áreas de toque de pelo menos 44 px.
+
 ## Endpoints
 
 | Método | Rota | Descrição |
@@ -35,16 +47,31 @@ Exemplo de corpo do `POST`:
 
 ## Como executar
 
-Pré-requisitos: Node.js 20+ e um MongoDB (local ou MongoDB Atlas).
+Pré-requisitos: Node.js 20.12+ e um MongoDB (local ou MongoDB Atlas).
 
 ```bash
 npm install
-
-# MongoDB local (porta padrão) ou informe a URI do Atlas
-export MONGODB_URI="mongodb://localhost:27017/controle-financeiro"
-
 npm run start:dev
 ```
+
+A URI do banco vem da variável `MONGODB_URI`, nesta ordem:
+
+1. exportada no terminal: `export MONGODB_URI="mongodb://localhost:27017/controle-financeiro"`;
+2. arquivo `.env` na raiz do projeto, com a linha `MONGODB_URI="..."` (carregado com `process.loadEnvFile`, recurso nativo do Node, sem dependência extra);
+3. se nenhuma das duas existir, `mongodb://localhost:27017/controle-financeiro`.
+
+Na inicialização, o log mostra a URI usada (com a senha mascarada) e de onde ela veio, e, quando tudo sobe, o endereço da aplicação:
+
+```
+[Inicializacao] MongoDB: mongodb+srv://usuario:****@cluster.mongodb.net (origem: arquivo .env)
+[Inicializacao] Aplicação no ar: http://localhost:3000
+```
+
+### Problemas comuns na inicialização
+
+- **MongoDB fora do ar ou URI errada**: a aplicação tenta conectar 2 vezes (até 5 s cada) e então **encerra com uma mensagem explicando a causa** (URI, origem e motivo, ex.: `ECONNREFUSED`) e como resolver. Ela não fica presa tentando para sempre.
+- **Navegador mostra outra página em `localhost:3000`** (ex.: "Hello, World!"): é outro programa usando a porta. A aplicação só abre a porta depois de conectar ao banco; confira no terminal se apareceu `Aplicação no ar`.
+- **Porta 3000 ocupada**: a aplicação avisa e encerra. Rode com outra porta: `PORT=3001 npm run start:dev`.
 
 Acesse o front-end em `http://localhost:3000` (arquivos estáticos em `src/public`).
 
@@ -52,8 +79,9 @@ Acesse o front-end em `http://localhost:3000` (arquivos estáticos em `src/publi
 
 ```
 src/
-├── main.ts                  # bootstrap + arquivos estáticos de src/public
-├── app.module.ts            # conexão com o MongoDB
+├── main.ts                  # bootstrap, mensagens de erro e src/public
+├── app.module.ts            # conexão com o MongoDB (forRootAsync, falha rápida)
+├── config/mongo.config.ts   # resolve a MONGODB_URI (terminal, .env ou padrão)
 ├── transacoes/              # módulo, controller, service, DTO e schema
 └── public/                  # front-end (index.html, style.css, script.js)
 ```

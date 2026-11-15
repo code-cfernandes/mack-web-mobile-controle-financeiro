@@ -3,63 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b3d66">
   <title>Controle Financeiro Pessoal</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+  <header class="topo">
     <h1>Controle Financeiro</h1>
     <p>Registre e acompanhe seus gastos de forma consciente (ODS 1 e ODS 12)</p>
   </header>
 
   <main>
-    <section id="dashboard" class="metricas" aria-label="Painel de métricas">
-      <div class="card">
-        <span class="rotulo">Saldo Total</span>
-        <span id="saldo-total" class="valor">R$ 0,00</span>
+    <!-- Tela 1 (inicial): Dashboard de Saúde Financeira -->
+    <section id="tela-dashboard" class="tela" aria-labelledby="titulo-dashboard">
+      <h2 id="titulo-dashboard">Saúde financeira</h2>
+
+      <div class="metricas" aria-live="polite">
+        <div class="card">
+          <span class="rotulo">Saldo Total</span>
+          <span id="saldo-total" class="valor">R$ 0,00</span>
+        </div>
+        <div class="card">
+          <span class="rotulo">Total de Despesas</span>
+          <span id="total-despesas" class="valor">R$ 0,00</span>
+        </div>
+        <div class="card destaque">
+          <span class="rotulo">Total Gasto por Impulso</span>
+          <span id="gasto-impulso" class="valor">R$ 0,00</span>
+          <span class="dica">Antes de comprar, pergunte-se: eu preciso disso?</span>
+        </div>
       </div>
-      <div class="card">
-        <span class="rotulo">Total de Despesas</span>
-        <span id="total-despesas" class="valor">R$ 0,00</span>
-      </div>
-      <div class="card destaque">
-        <span class="rotulo">Total Gasto por Impulso</span>
-        <span id="gasto-impulso" class="valor">R$ 0,00</span>
+
+      <div class="extrato">
+        <h2>Extrato</h2>
+        <ul id="historico">
+          <li class="vazio">Carregando...</li>
+        </ul>
       </div>
     </section>
 
-    <section class="formulario">
-      <h2>Nova transação</h2>
-      <form id="form-transacao">
+    <!-- Tela 2: Formulário de nova transação -->
+    <section id="tela-formulario" class="tela" aria-labelledby="titulo-formulario" hidden>
+      <h2 id="titulo-formulario">Nova transação</h2>
+
+      <form id="form-transacao" class="formulario" novalidate>
         <label for="descricao">Descrição</label>
         <input type="text" id="descricao" name="descricao" placeholder="Ex.: Conta de Luz" required>
 
         <label for="valor">Valor (R$)</label>
-        <input type="number" id="valor" name="valor" step="0.01" min="0.01" required>
+        <input type="number" id="valor" name="valor" inputmode="decimal" step="0.01" min="0.01" placeholder="0,00" required>
 
-        <fieldset>
+        <fieldset class="opcoes">
           <legend>Tipo</legend>
-          <label><input type="radio" name="tipo" value="receita" required> Receita</label>
+          <label><input type="radio" name="tipo" value="receita"> Receita</label>
           <label><input type="radio" name="tipo" value="despesa" checked> Despesa</label>
         </fieldset>
 
         <label for="categoria">Categoria</label>
-        <input type="text" id="categoria" name="categoria" placeholder="Ex.: Moradia, Alimentação, Lazer" required>
+        <input type="text" id="categoria" name="categoria" list="sugestoes-categoria" placeholder="Ex.: Moradia, Alimentação, Lazer" required>
+        <datalist id="sugestoes-categoria">
+          <option value="Alimentação">
+          <option value="Moradia">
+          <option value="Transporte">
+          <option value="Saúde">
+          <option value="Educação">
+          <option value="Lazer">
+          <option value="Salário">
+        </datalist>
 
-        <label class="checkbox">
-          <input type="checkbox" id="consumo-consciente" name="consumoConsciente" checked>
-          Gasto consciente (essencial)
-        </label>
+        <fieldset class="opcoes" id="grupo-consumo">
+          <legend>Este gasto foi...</legend>
+          <label><input type="radio" name="consumo" value="consciente" checked> Consciente (essencial)</label>
+          <label><input type="radio" name="consumo" value="impulso"> Por impulso</label>
+        </fieldset>
 
-        <button type="submit">Salvar</button>
+        <button type="submit" id="botao-salvar">Salvar</button>
       </form>
     </section>
-
-    <section class="extrato">
-      <h2>Extrato</h2>
-      <ul id="historico"></ul>
-    </section>
   </main>
+
+  <!-- Mensagem de retorno (sucesso ou erro) -->
+  <div id="mensagem" class="mensagem" role="status" aria-live="assertive" hidden></div>
+
+  <!-- Navegação inferior, no padrão de apps de celular -->
+  <nav class="navegacao" aria-label="Navegação principal">
+    <a href="#dashboard" data-tela="dashboard">
+      <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Início
+    </a>
+    <a href="#nova" data-tela="nova">
+      <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v9M7.5 12h9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Nova transação
+    </a>
+  </nav>
 
   <script src="script.js"></script>
 </body>
