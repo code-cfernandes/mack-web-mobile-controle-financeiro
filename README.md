@@ -54,10 +54,11 @@ npm install
 npm run start:dev
 ```
 
-A URI do banco vem da variável `MONGODB_URI`, nesta ordem:
+A URI do banco vem das variáveis `MONGODB_URI` ou `MONGO_URI` (os dois nomes são
+aceitos), nesta ordem:
 
-1. exportada no terminal: `export MONGODB_URI="mongodb://localhost:27017/controle-financeiro"`;
-2. arquivo `.env` na raiz do projeto, com a linha `MONGODB_URI="..."` (carregado com `process.loadEnvFile`, recurso nativo do Node, sem dependência extra);
+1. exportada no terminal: `export MONGO_URI="mongodb://localhost:27018/controle-financeiro"` (ou `export MONGODB_URI="..."`);
+2. arquivo `.env` na raiz do projeto, com a linha `MONGO_URI="..."` ou `MONGODB_URI="..."` (carregado com `process.loadEnvFile`, recurso nativo do Node, sem dependência extra);
 3. se nenhuma das duas existir, `mongodb://localhost:27017/controle-financeiro`.
 
 Na inicialização, o log mostra a URI usada (com a senha mascarada) e de onde ela veio, e, quando tudo sobe, o endereço da aplicação:
@@ -81,7 +82,7 @@ Acesse o front-end em `http://localhost:3000` (arquivos estáticos em `src/publi
 src/
 ├── main.ts                  # bootstrap, mensagens de erro e src/public
 ├── app.module.ts            # conexão com o MongoDB (forRootAsync, falha rápida)
-├── config/mongo.config.ts   # resolve a MONGODB_URI (terminal, .env ou padrão)
+├── config/mongo.config.ts   # resolve a MONGO_URI/MONGODB_URI (terminal, .env ou padrão)
 ├── transacoes/              # módulo, controller, service, DTO e schema
 └── public/                  # front-end (index.html, style.css, script.js)
 ```

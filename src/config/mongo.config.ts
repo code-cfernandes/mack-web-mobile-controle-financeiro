@@ -9,21 +9,43 @@ export type OrigemUri =
   'variável de ambiente' | 'arquivo .env' | 'valor padrão';
 
 /**
- * Resolve a MONGODB_URI na ordem: variável exportada no terminal, arquivo
- * .env na raiz do projeto e, por último, o MongoDB local na porta padrão.
- * O resultado fica em process.env.MONGODB_URI para o AppModule usar.
+ * Nomes de variável aceitos para a URI do MongoDB. O app lê os dois porque
+ * `MONGO_URI` é a convenção mais comum (Docker, Atlas, tutoriais), enquanto
+ * `MONGODB_URI` é o nome usado na documentação deste projeto.
+ */
+const NOMES_DA_VARIAVEL = ['MONGODB_URI', 'MONGO_URI'] as const;
+
+function uriDoAmbiente(): string | undefined {
+  for (const nome of NOMES_DA_VARIAVEL) {
+    const valor = process.env[nome];
+    if (valor && valor.trim() !== '') {
+      return valor.trim();
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Resolve a URI na ordem: variável exportada no terminal (MONGODB_URI ou
+ * MONGO_URI), arquivo .env na raiz do projeto e, por último, o MongoDB local
+ * na porta padrão. O resultado fica em process.env.MONGODB_URI para o
+ * AppModule usar.
  */
 export function carregarMongoUri(): { uri: string; origem: OrigemUri } {
-  if (process.env.MONGODB_URI) {
-    return { uri: process.env.MONGODB_URI, origem: 'variável de ambiente' };
+  const uriAmbiente = uriDoAmbiente();
+  if (uriAmbiente) {
+    process.env.MONGODB_URI = uriAmbiente;
+    return { uri: uriAmbiente, origem: 'variável de ambiente' };
   }
 
   const arquivoEnv = join(process.cwd(), '.env');
   if (existsSync(arquivoEnv)) {
     // Recurso nativo do Node (20.12+): não sobrescreve variáveis já definidas
     process.loadEnvFile(arquivoEnv);
-    if (process.env.MONGODB_URI) {
-      return { uri: process.env.MONGODB_URI, origem: 'arquivo .env' };
+    const uriDoArquivo = uriDoAmbiente();
+    if (uriDoArquivo) {
+      process.env.MONGODB_URI = uriDoArquivo;
+      return { uri: uriDoArquivo, origem: 'arquivo .env' };
     }
   }
 

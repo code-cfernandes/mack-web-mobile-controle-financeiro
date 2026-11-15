@@ -56,9 +56,10 @@ function mostrarErroDeConexao(uri: string, origem: string, erro: unknown) {
     `Motivo:    ${motivo}`,
     '',
     'Como resolver:',
-    '  - Atlas: crie um .env na raiz do projeto com MONGODB_URI="mongodb+srv://..."',
+    '  - Atlas: crie um .env na raiz do projeto com MONGO_URI="mongodb+srv://..."',
+    '    (ou MONGODB_URI="mongodb+srv://..."; os dois nomes funcionam)',
     '  - Docker: docker start mongo-financeiro e rode com',
-    '      MONGODB_URI="mongodb://localhost:27018/controle-financeiro" npm run start:dev',
+    '      MONGO_URI="mongodb://localhost:27018/controle-financeiro" npm run start:dev',
     '  - Ou suba um MongoDB local na porta 27017.',
   ];
   logger.error('\n\n' + linhas.map((l) => '  ' + l).join('\n') + '\n');

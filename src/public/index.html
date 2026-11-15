@@ -97,6 +97,23 @@
     </a>
   </nav>
 
-  <script src="script.js"></script>
+  <!--
+    Aviso de servidor indisponível. Fica embutido no HTML (sem depender do
+    style.css e do script.js) porque, com o servidor fora do ar, o navegador
+    pode exibir uma cópia guardada desta página sem conseguir baixar esses
+    arquivos.
+  -->
+  <div id="aviso-servidor" role="alert"
+       style="display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:1rem;background:#f2f4f7;font-family:system-ui,sans-serif;">
+    <div style="max-width:420px;background:#fff;border-left:6px solid #c62828;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.15);line-height:1.5;color:#1f2933;">
+      <h2 style="margin:0 0 .5rem;color:#c62828;font-size:1.2rem;">Servidor indisponível</h2>
+      <p style="margin:0 0 .75rem;">Não foi possível carregar a aplicação. O servidor não está rodando ou não conseguiu se conectar ao banco de dados.</p>
+      <p style="margin:0 0 1rem;font-size:.9rem;color:#52606d;">Verifique a mensagem exibida no terminal onde a aplicação foi iniciada e tente novamente.</p>
+      <button type="button" onclick="location.reload()"
+              style="min-height:44px;width:100%;font-size:1rem;font-weight:700;color:#fff;background:#0b3d66;border:0;border-radius:8px;cursor:pointer;">Tentar novamente</button>
+    </div>
+  </div>
+
+  <script src="script.js" onerror="document.getElementById('aviso-servidor').style.display = 'flex'"></script>
 </body>
 </html>
